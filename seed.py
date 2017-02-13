@@ -11,9 +11,9 @@ def random_alias():
 if __name__ == '__main__':
     client = MongoClient()
     coll = client['competition']['results']
-    coll.drop() # in future, remove this and treat as updated scores
-    for i in range(20):
-        netid = random_netid()
+    netids = ['bob', 'fred', 'billy', 'joe', 'sue', 'sally', 'ferdinand',
+              'augustus', 'leonard']
+    for netid in netids:
         alias = random_alias()
         ndcg = round(random.uniform(0, 1), 1)
         coll.insert({'netid': netid, 'alias': alias, 'ndcg': ndcg})

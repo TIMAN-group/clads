@@ -40,4 +40,5 @@
         <td><strong>Rank</strong></td>
         <td><strong>Alias</strong></td>
         <td><strong>NDCG@10</strong></td>
+        <td><strong>Previous</strong></td>
       </tr>
