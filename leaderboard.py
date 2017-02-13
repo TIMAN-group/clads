@@ -15,9 +15,15 @@ def get_scores():
     client = MongoClient()
     coll = client['competition']['results']
     html = ''
-    for idx, result in enumerate(coll.find()):
-        html += "<tr><td>{}</td><td>{}</td>".format(idx + 1, result['alias'])
-        html += "<td>{}</td></tr>\n".format(result['ndcg'])
+    ranked = sorted(coll.find(), key=lambda r: r['ndcg'], reverse=True)
+    cur_score = 1.1
+    cur_rank = 0
+    for result in ranked:
+        if result['ndcg'] < cur_score:
+            cur_rank += 1
+        cur_score = result['ndcg']
+        html += "<tr><td>{}</td><td>{}</td>".format(cur_rank, result['alias'])
+        html += "<td>{}</td></tr>\n".format(cur_score)
     return html
 
 @app.route('/')
