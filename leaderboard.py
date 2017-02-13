@@ -1,6 +1,8 @@
+from flask import Flask, request
+app = Flask(__name__, static_folder='.', static_url_path='')
 from pymongo import MongoClient
 
-def add_scores():
+def get_scores():
     """
     Loop through entries in DB and select the latest ones for each unique user
     id. Sort in descending order and display in table rows. Can also add a
@@ -9,10 +11,6 @@ def add_scores():
     This assumes we have a MongoDB instance running with a db called
     "competition" and a collection called "results" with fields for alias and
     ndcg.
-
-    These docs are inserted into the DB while running unit_test.py. Each
-    student's ranking function should have an alias member variable, and we need
-    a way to get a user id (grading script should have this).
     """
     client = MongoClient()
     coll = client['competition']['results']
@@ -22,10 +20,12 @@ def add_scores():
         html += "<td>{}</td></tr>\n".format(result['ndcg'])
     return html
 
+@app.route('/')
+def root():
+    return "{}{}{}".format(app.head_html, get_scores(), app.tail_html)
+
 if __name__ == '__main__':
     with open('index.html.head') as head_in:
-        html = head_in.read()
-    html += add_scores()
-    with open('index.html', 'w') as outfile:
-        outfile.write(html)
-        outfile.write('</table> </div> </div> </body> </html>')
+        app.head_html = head_in.read()
+    app.tail_html = '</table> </div> </div> </body> </html>'
+    app.run(debug=True)
