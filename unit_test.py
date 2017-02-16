@@ -9,7 +9,7 @@ class TestRanker(unittest.TestCase):
     submission_url = 'http://0.0.0.0:5000/api'
     top_k = 10
     queries = ['Airbus Subsidies', 'South African Sanctions',
-               'Leveraged Buyouts', 'Satellite Launch Contracts'],
+               'Leveraged Buyouts', 'Satellite Launch Contracts',
                'Insider Trading']
 
     def test_creation(self):

@@ -1,0 +1,10 @@
+prefix = "/data"
+dataset = "apnews"
+corpus = "line.toml"
+index = "../ranking-functions/idx"
+query-judgements = "../ranking-functions/qrels.txt"
+
+[[analyzers]]
+method = "ngram-word"
+ngram = 1
+filter = [{type = "icu-tokenizer"}, {type = "lowercase"}]
