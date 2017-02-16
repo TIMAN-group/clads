@@ -2,9 +2,6 @@ from pymongo import MongoClient
 import random
 import string
 
-def random_netid():
-    return "{}{}".format(random_alias(), random.choice([range(100)]))
-
 def random_alias():
     return ''.join(random.choice(string.ascii_lowercase) for _ in range(8))
 
