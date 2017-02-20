@@ -1,6 +1,21 @@
 Example code for creating a competition. **Under construction!**
 
-```python
+## Setup database
+
+```bash
+mkdir db
+mongod --dbpath db --fork
+mongo
+> use competition
+> db.createCollection('results')
+> db.results.createIndex({'netid': 1})
+> exit
+mongod --shutdown --dbpath db
+```
+
+## Run
+
+```bash
 mongod --dbpath db --fork
 python seed.py
 python leaderboard.py

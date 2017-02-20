@@ -4,6 +4,11 @@ from flask import Flask, request, Response
 app = Flask(__name__, static_folder='.', static_url_path='')
 from pymongo import MongoClient
 
+def make_tr(elems):
+    def td_elem(elem):
+        return "<td>{}</td>".format(elem)
+    return "<tr>{}</tr>\n".format(''.join([td_elem(e) for e in elems]))
+
 def write_html(ranked):
     """
     Given the list of sorted results, display them in an HTML table.
@@ -11,18 +16,26 @@ def write_html(ranked):
     cur_score = 1.1
     cur_rank = 0
     html = ''
-    for result in ranked:
+    error_glyph = '<span class="glyphicon glyphicon-warning-sign"';
+    error_glyph += 'aria-hidden="true" title="An error occurred!"></span>'
+    for cur_idx, result in enumerate(ranked):
         if result['ndcg'] < cur_score:
-            cur_rank += 1
+            cur_rank = cur_idx + 1
         cur_score = result['ndcg']
         if cur_score == -1.0:
-            cur_score = result['fail']
-        html += "<tr><td>{}</td><td>{}</td>".format(cur_rank, result['alias'])
-        html += "<td>{}</td><td><em>{}</em></td></tr>\n".format(cur_score,
-                result['previous'])
+            display_score = "{}&nbsp;{}".format(error_glyph, result['fail'])
+        else:
+            display_score = "{:8.5f}".format(cur_score)
+        if result['previous'] == -1.0:
+            display_prev = error_glyph
+        else:
+            display_prev = "{:8.5f}".format(result['previous'])
+        gen_time = result['_id'].generation_time.strftime('%Y-%m-%d | %H:%M:%S')
+        html += make_tr([cur_rank, result['alias'], display_score,
+                         display_prev, gen_time, result['submissions']])
     return html
 
-def update_scores(prune_old=True):
+def update_scores(prune_old=False):
     """
     Refreshes the results page with the latest info from the db. If prune_old is
     true, old scores are removed from the db.
@@ -32,6 +45,7 @@ def update_scores(prune_old=True):
         docs = list(app.coll.find({'netid': netid}))
         docs.sort(key=lambda d: d['_id'].generation_time, reverse=True)
         doc = docs.pop(0)
+        doc['submissions'] = len(docs) + 1
         doc['previous'] = None
         if len(docs) > 0:
             prev = docs.pop(0)
@@ -78,7 +92,6 @@ def compute_ndcg():
     return Response(json.dumps(resp_data), status=200,
                     mimetype='application/json')
 
-# TODO: can we have update_scores() called only on an update to the db?
 @app.route('/')
 def root():
     """

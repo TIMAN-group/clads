@@ -37,8 +37,10 @@
     <div class="row">
       <table class="table">
       <tr>
-        <td><strong>Rank</strong></td>
-        <td><strong>Alias</strong></td>
-        <td><strong>NDCG@10</strong></td>
-        <td><strong>Previous</strong></td>
+        <th><strong>Rank</strong></th>
+        <th><strong>Alias</strong></th>
+        <th><strong>NDCG@10</strong></th>
+        <th><strong>Previous</strong></th>
+        <th><strong>Run</strong></th>
+        <th><strong>Submissions</strong></th>
       </tr>
