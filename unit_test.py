@@ -27,7 +27,7 @@ class TestRanker(unittest.TestCase):
         leaderboard.
         """
         req = {'netid': 'student22', 'alias': 'my_alias', 'results': None, 'error': None}
-        timeout_len = 1
+        timeout_len = 60
         try:
             with Timeout(timeout_len):
                 ranker = load_ranker()
