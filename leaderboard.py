@@ -83,7 +83,9 @@ def compute_ndcg():
     jdata = request.json
     netid, alias, results = jdata['netid'], jdata['alias'], jdata['results']
     resp_data = {'submission_success': True}
-    if len(results) != app.num_queries:
+    if results is None:
+        insert_results(netid, alias, None, fail_reason=jdata['error'])
+    elif len(results) != app.num_queries:
         insert_results(netid, alias, None,
                        fail_reason='Incorrect number of queries')
         resp_data['submission_success'] = False

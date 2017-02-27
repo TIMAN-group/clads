@@ -2,6 +2,7 @@ import requests
 import unittest
 import metapy
 import json
+from timeout import Timeout
 from search_eval import load_ranker
 
 class TestRanker(unittest.TestCase):
@@ -25,14 +26,22 @@ class TestRanker(unittest.TestCase):
         unit test is failed, and the failure string is also reproduced on the
         leaderboard.
         """
-        ranker = load_ranker()
-        idx = metapy.index.make_inverted_index(self.cfg_file)
-        query = metapy.index.Document()
-        results = []
-        for query_text in self.queries:
-            query.content(query_text)
-            results.append(ranker.score(idx, query, self.top_k))
-        req = {'netid': 'student22', 'alias': 'my_alias', 'results': results}
+        req = {'netid': 'student22', 'alias': 'my_alias', 'results': None, 'error': None}
+        timeout_len = 1
+        try:
+            with Timeout(timeout_len):
+                ranker = load_ranker()
+                idx = metapy.index.make_inverted_index(self.cfg_file)
+                query = metapy.index.Document()
+                results = []
+                for query_text in self.queries:
+                    query.content(query_text)
+                    results.append(ranker.score(idx, query, self.top_k))
+                req['results'] = results
+        except Timeout.Timeout:
+            error_msg = "Timeout error: {}s".format(timeout_len)
+            req['error'] = error_msg
+            print(error_msg)
         response = requests.post(self.submission_url, json=req)
         jdata = response.json()
         self.assertTrue(jdata['submission_success'])
