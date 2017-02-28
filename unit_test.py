@@ -1,7 +1,8 @@
+import json
+import metapy
+import os
 import requests
 import unittest
-import metapy
-import json
 from timeout import Timeout
 from search_eval import load_ranker
 
@@ -26,7 +27,10 @@ class TestRanker(unittest.TestCase):
         unit test is failed, and the failure string is also reproduced on the
         leaderboard.
         """
-        req = {'netid': 'student22', 'alias': 'my_alias', 'results': None, 'error': None}
+        req = {'token': os.environ.get('GITLAB_API_TOKEN'),
+               'alias': os.environ.get('COMPETITION_ALIAS') or 'Anonymous',
+               'results': None,
+               'error': None}
         timeout_len = 60
         try:
             with Timeout(timeout_len):

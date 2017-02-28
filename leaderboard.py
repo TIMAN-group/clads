@@ -1,8 +1,20 @@
-import metapy
 import json
+import metapy
+import requests
+
 from flask import Flask, request, Response
 app = Flask(__name__, static_folder='.', static_url_path='')
 from pymongo import MongoClient
+
+GITLAB_API_URL = 'https://gitlab.textdata.org/api/v3'
+
+def get_netid(token):
+    try:
+        r = requests.get("{}/user".format(GITLAB_API_URL),
+                         headers={'PRIVATE-TOKEN': token})
+        return r.json()['username']
+    except e:
+        return None
 
 def make_tr(elems):
     def td_elem(elem):
@@ -81,16 +93,22 @@ def compute_ndcg():
     the results into the database.
     """
     jdata = request.json
-    netid, alias, results = jdata['netid'], jdata['alias'], jdata['results']
-    resp_data = {'submission_success': True}
-    if results is None:
-        insert_results(netid, alias, None, fail_reason=jdata['error'])
-    elif len(results) != app.num_queries:
-        insert_results(netid, alias, None,
-                       fail_reason='Incorrect number of queries')
+    token, alias, results = jdata['token'], jdata['alias'], jdata['results']
+
+    netid = get_netid(token)
+    if netid is None:
         resp_data['submission_success'] = False
+        resp_data['error'] = 'Failed to obtain netid from GitLab'
     else:
-        insert_results(netid, alias, results)
+        resp_data = {'submission_success': True}
+        if results is None:
+            insert_results(netid, alias, None, fail_reason=jdata['error'])
+        elif len(results) != app.num_queries:
+            insert_results(netid, alias, None,
+                           fail_reason='Incorrect number of queries')
+            resp_data['submission_success'] = False
+        else:
+            insert_results(netid, alias, results)
     return Response(json.dumps(resp_data), status=200,
                     mimetype='application/json')
 
