@@ -4,7 +4,7 @@ import metapy
 import requests
 import pytoml
 
-from flask import Flask, request, Response
+from flask import Flask, request, Response, render_template
 app = Flask(__name__, static_folder='.', static_url_path='')
 from pymongo import MongoClient
 
@@ -135,7 +135,8 @@ def root():
     """
     Recalculates the latest scores and displays them.
     """
-    return "{}{}{}".format(app.head_html, update_scores(), app.tail_html)
+    return render_template('index.html', datasets=app.datasets,
+            top_k=app.top_k, participants=[])
 
 def load_config():
     """
@@ -161,9 +162,6 @@ if __name__ == '__main__':
     if len(sys.argv) != 2:
         print("Usage: python {} datasets.toml".format(sys.argv[0]))
         sys.exit(1)
-    with open('index.html.head') as head_in:
-        app.head_html = head_in.read()
-    app.tail_html = '</table> </div> </div> </body> </html>'
     load_config()
     app.client = MongoClient()
     app.coll = app.client['competition']['results']
