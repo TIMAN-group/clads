@@ -14,5 +14,5 @@ filter = "default-unigram-chain"
 
 [query-runner]
 query-path = "/data/cranfield/cranfield-queries.txt"
-query-id-start = 0
+query-id-start = 1
 timeout = 60

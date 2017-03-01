@@ -13,4 +13,5 @@ if __name__ == '__main__':
     for netid in netids:
         alias = random_alias()
         ndcg = round(random.uniform(0, 1), 1)
-        coll.insert({'netid': netid, 'alias': alias, 'ndcg': ndcg})
+        coll.insert({'netid': netid, 'alias': alias, 'ndcg': ndcg,
+                     'dataset': 'apnews'})

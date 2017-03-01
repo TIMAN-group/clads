@@ -1,6 +1,8 @@
+import sys
 import json
 import metapy
 import requests
+import pytoml
 
 from flask import Flask, request, Response
 app = Flask(__name__, static_folder='.', static_url_path='')
@@ -13,7 +15,7 @@ def get_netid(token):
         r = requests.get("{}/user".format(GITLAB_API_URL),
                          headers={'PRIVATE-TOKEN': token})
         return r.json()['username']
-    except e:
+    except:
         return None
 
 def make_tr(elems):
@@ -35,7 +37,7 @@ def write_html(ranked):
             cur_rank = cur_idx + 1
         cur_score = result['ndcg']
         if cur_score == -1.0:
-            display_score = "{}&nbsp;{}".format(error_glyph, result['fail'])
+            display_score = "{}&nbsp;{}".format(error_glyph, result['error'])
         else:
             display_score = "{:8.5f}".format(cur_score)
         if result['previous'] == -1.0:
@@ -69,22 +71,35 @@ def update_scores(prune_old=False):
     results.sort(key=lambda r: r['ndcg'], reverse=True)
     return write_html(results)
 
-def insert_results(netid, alias, results, fail_reason=None):
+def insert_results(netid, alias, dataset, results, error):
     """
     Score the student's submission and insert it if there wasn't a failure
     beforehand. If there was a failure, store the reason so it can be displayed
     on the leaderboard.
     """
-    doc = {'netid': netid, 'alias': alias, 'ndcg': -1.0, 'fail': None}
-    if fail_reason is None:
+    doc = {'netid': netid, 'dataset': dataset, 'alias': alias, 'ndcg': -1.0,
+           'error': None}
+    retval = True
+    if results is None or error is not None:
+        doc['error'] = error
+        doc['results'] = None
+        retval = False
+    elif len(results) != app.num_queries[dataset]:
+        msg = "Got {} queries, expected {}".format(len(results),
+                                                   app.num_queries[dataset])
+        doc['error'] = msg
+        doc['results'] = None
+        retval = False
+    else:
         ndcg = 0.0
+        query_start = app.query_start[dataset]
         for query_num, result in enumerate(results):
             result = [tuple(elem) for elem in result]
-            ndcg += app.ir_eval.ndcg(result, query_num, app.top_k)
-        doc['ndcg'] = ndcg / app.num_queries
-    else:
-        doc['fail'] = fail_reason
+            ndcg += app.ir_eval[dataset].ndcg(result, query_num + query_start,
+                                              app.top_k[dataset])
+        doc['ndcg'] = ndcg / app.num_queries[dataset]
     app.coll.insert_one(doc)
+    return retval
 
 @app.route('/api', methods=['POST'])
 def compute_ndcg():
@@ -93,24 +108,27 @@ def compute_ndcg():
     the results into the database.
     """
     jdata = request.json
-    token, alias, results = jdata['token'], jdata['alias'], jdata['results']
-
+    token, alias, result_arr = jdata['token'], jdata['alias'], jdata['results']
     netid = get_netid(token)
-    if netid is None:
-        resp_data['submission_success'] = False
-        resp_data['error'] = 'Failed to obtain netid from GitLab'
+    resp = {'submission_success': True}
+    datasets = set(r['dataset'] for r in result_arr)
+    errors = []
+    if datasets != app.datasets:
+        errors.append("Mismatched datasets: {} vs {}".format(datasets,
+                                                             app.datasets))
+        resp['submission_success'] = False
+    elif netid is None:
+        resp['submission_success'] = False
+        errors.append('Failed to obtain netid from GitLab')
     else:
-        resp_data = {'submission_success': True}
-        if results is None:
-            insert_results(netid, alias, None, fail_reason=jdata['error'])
-        elif len(results) != app.num_queries:
-            insert_results(netid, alias, None,
-                           fail_reason='Incorrect number of queries')
-            resp_data['submission_success'] = False
-        else:
-            insert_results(netid, alias, results)
-    return Response(json.dumps(resp_data), status=200,
-                    mimetype='application/json')
+        for entry in result_arr:
+            success = insert_results(netid, alias, entry['dataset'],
+                                     entry['results'], entry['error'])
+            if not success:
+                errors.append("{}: {}".format(entry['dataset'], entry['error']))
+                resp['submission_success'] = False
+    resp['error'] = '; '.join(errors) if len(errors) > 0 else None
+    return Response(json.dumps(resp), status=200, mimetype='application/json')
 
 @app.route('/')
 def root():
@@ -119,13 +137,34 @@ def root():
     """
     return "{}{}{}".format(app.head_html, update_scores(), app.tail_html)
 
+def load_config():
+    """
+    Read the leaderboard config file, which specifies dataset-specific
+    information.
+    """
+    app.ir_eval, app.top_k, app.num_queries, app.query_start = {}, {}, {}, {}
+    app.datasets = set()
+    with open(sys.argv[1]) as infile:
+        cfg = pytoml.load(infile)
+    for dset in cfg['datasets']:
+        name = dset['name']
+        app.ir_eval[name] = metapy.index.IREval(dset['config'])
+        app.top_k[name] = dset['top-k']
+        app.num_queries[name] = dset['num-queries']
+        app.query_start[name] = dset['query-id-start']
+        app.datasets.add(name)
+    num = len(app.datasets)
+    print("Loaded {} dataset{}: {}".format(num, '' if num == 1 else 's',
+                                           app.datasets))
+
 if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print("Usage: python {} datasets.toml".format(sys.argv[0]))
+        sys.exit(1)
     with open('index.html.head') as head_in:
         app.head_html = head_in.read()
     app.tail_html = '</table> </div> </div> </body> </html>'
-    app.ir_eval = metapy.index.IREval('config.toml')
-    app.top_k = 10
-    app.num_queries = 5
+    load_config()
     app.client = MongoClient()
     app.coll = app.client['competition']['results']
     app.run(debug=True)

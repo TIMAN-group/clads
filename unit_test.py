@@ -19,7 +19,7 @@ class TestRanker(unittest.TestCase):
     submission_url = 'http://0.0.0.0:5000/api'
     top_k = 10
 
-    def test_creation(self, cfg_file):
+    def test_creation(self):
         for cfg_file in self.cfgs:
             ranker = load_ranker(cfg_file)
 
@@ -55,11 +55,11 @@ class TestRanker(unittest.TestCase):
         }
 
         for cfg_file in self.cfgs:
-            res = {}
+            res = {'error': None}
             with open(cfg_file, 'r') as fin:
                 cfg_d = pytoml.load(fin)
-            res['name'] = cfg_d['dataset']
-            print("\nRunning on {}...".format(res['name']))
+            res['dataset'] = cfg_d['dataset']
+            print("\nRunning on {}...".format(res['dataset']))
             query_path = cfg_d['query-runner']['query-path']
             timeout_len = cfg_d['query-runner']['timeout']
 
@@ -69,12 +69,12 @@ class TestRanker(unittest.TestCase):
             except Timeout.Timeout:
                 error_msg = "Timeout error: {}s".format(timeout_len)
                 res['error'] = error_msg
-                print(error_msg)
 
             req['results'].append(res)
 
         response = requests.post(self.submission_url, json=req)
         jdata = response.json()
+        print(jdata)
         self.assertTrue(jdata['submission_success'])
 
 

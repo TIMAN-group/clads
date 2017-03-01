@@ -1,0 +1,6 @@
+[[datasets]]
+name = "cranfield"
+config = "cranfield-config.toml"
+top-k = 10
+num-queries = 225
+query-id-start = 1
