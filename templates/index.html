@@ -70,7 +70,7 @@
           {% for participant in participants %}
           <tr>
             <td>{{ participant.rank }}</td>
-            <td>{{ participant.alias }}</td>
+            <td>{{ participant.alias | e }}</td>
             <td>{{ participant.score }}</td>
             <td>{{ participant.prev_score }}</td>
             {% for dataset in datasets %}
