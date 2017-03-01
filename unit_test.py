@@ -19,15 +19,16 @@ class TestRanker(unittest.TestCase):
     submission_url = 'http://0.0.0.0:5000/api'
     top_k = 10
 
-    def test_creation(self):
-        ranker = load_ranker()
+    def test_creation(self, cfg_file):
+        for cfg_file in self.cfgs:
+            ranker = load_ranker(cfg_file)
 
     def test_load_index(self):
         for cfg_file in self.cfgs:
             idx = metapy.index.make_inverted_index(cfg_file)
 
     def get_results(self, cfg_file, query_path):
-        ranker = load_ranker()
+        ranker = load_ranker(cfg_file)
         idx = metapy.index.make_inverted_index(cfg_file)
         query = metapy.index.Document()
 

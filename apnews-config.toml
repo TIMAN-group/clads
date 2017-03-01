@@ -1,10 +1,18 @@
 prefix = "/data"
-dataset = "apnews"
+stop-words = "/data/stop-words.txt"
+
+dataset = "cranfield"
 corpus = "line.toml"
-index = "../ranking-functions/idx"
-query-judgements = "../ranking-functions/qrels.txt"
+index = "/data/idx/cranfield-idx"
+
+query-judgements = "/data/cranfield/cranfield-qrels.txt"
 
 [[analyzers]]
 method = "ngram-word"
 ngram = 1
-filter = [{type = "icu-tokenizer"}, {type = "lowercase"}]
+filter = "default-unigram-chain"
+
+[query-runner]
+query-path = "/data/cranfield/cranfield-queries.txt"
+query-id-start = 0
+timeout = 60
