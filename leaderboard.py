@@ -23,8 +23,7 @@ def update_doc(netid):
     """
     Creates a single row entry for the results table.
     """
-    # Find the two most recent records for netid (order by descending _id).
-    docs = list(app.coll.find({'netid': netid}).sort([('_id', -1)]).limit(2))
+    docs = list(app.coll.find({'netid': netid}).sort([('_id', -1)]))
     doc = docs.pop(0)
     doc['num_submissions'] = len(docs) + 1
     prev_doc = None
