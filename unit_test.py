@@ -69,6 +69,7 @@ class TestRanker(unittest.TestCase):
             except Timeout.Timeout:
                 error_msg = "Timeout error: {}s".format(timeout_len)
                 res['error'] = error_msg
+                res['results'] = []
 
             req['results'].append(res)
 

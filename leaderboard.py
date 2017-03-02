@@ -1,5 +1,6 @@
 import sys
 import json
+import math
 import metapy
 import requests
 import pytoml
@@ -18,88 +19,76 @@ def get_netid(token):
     except:
         return None
 
-def make_tr(elems):
-    def td_elem(elem):
-        return "<td>{}</td>".format(elem)
-    return "<tr>{}</tr>\n".format(''.join([td_elem(e) for e in elems]))
-
-def write_html(ranked):
+def update_doc(netid):
     """
-    Given the list of sorted results, display them in an HTML table.
+    Creates a single row entry for the results table.
     """
-    cur_score = 1.1
-    cur_rank = 0
-    html = ''
-    error_glyph = '<span class="glyphicon glyphicon-warning-sign"';
-    error_glyph += 'aria-hidden="true" title="An error occurred!"></span>'
-    for cur_idx, result in enumerate(ranked):
-        if result['ndcg'] < cur_score:
-            cur_rank = cur_idx + 1
-        cur_score = result['ndcg']
-        if cur_score == -1.0:
-            display_score = "{}&nbsp;{}".format(error_glyph, result['error'])
+    # Find the two most recent records for netid (order by descending _id).
+    docs = list(app.coll.find({'netid': netid}).sort([('_id', -1)]).limit(2))
+    doc = docs.pop(0)
+    doc['num_submissions'] = len(docs) + 1
+    prev_doc = None
+    if len(docs) > 0:
+        prev_doc = docs.pop(0)
+    gen_time = doc['_id'].generation_time
+    doc['last_run'] = gen_time.strftime('%Y-%m-%d | %H:%M:%S')
+    overall_score, overall_prev = 0.0, 0.0
+    for dset, vals in doc['dataset_scores'].items():
+        overall_score += vals['score']
+        doc['dataset_scores'][dset]['prev_score'] = -math.inf
+        # If there was an error, show error text instead of -inf score.
+        if vals['error']:
+            doc['dataset_scores'][dset]['score'] = vals['error']
         else:
-            display_score = "{:8.5f}".format(cur_score)
-        if result['previous'] == -1.0:
-            display_prev = error_glyph
-        else:
-            display_prev = "{:8.5f}".format(result['previous'])
-        gen_time = result['_id'].generation_time.strftime('%Y-%m-%d | %H:%M:%S')
-        html += make_tr([cur_rank, result['alias'], display_score,
-                         display_prev, gen_time, result['submissions']])
-    return html
+            doc['dataset_scores'][dset]['score'] = round(vals['score'], 4)
+        if prev_doc:
+            prev_score = prev_doc['dataset_scores'][dset]['score']
+            overall_prev += prev_score
+            doc['dataset_scores'][dset]['prev_score'] = round(prev_score, 4)
+    doc['score'] = round(overall_score / len(doc['dataset_scores']), 4)
+    doc['prev_score'] = -math.inf
+    if prev_doc:
+        prev_score = overall_prev / len(prev_doc['dataset_scores'])
+        doc['prev_score'] = round(prev_score, 4)
+    return doc
 
-def update_scores(prune_old=False):
+def update_scores():
     """
-    Refreshes the results page with the latest info from the db. If prune_old is
-    true, old scores are removed from the db.
+    Refreshes the results page with the latest info from the db.
     """
     results = []
     for netid in app.coll.find().distinct('netid'):
-        docs = list(app.coll.find({'netid': netid}))
-        docs.sort(key=lambda d: d['_id'].generation_time, reverse=True)
-        doc = docs.pop(0)
-        doc['submissions'] = len(docs) + 1
-        doc['previous'] = None
-        if len(docs) > 0:
-            prev = docs.pop(0)
-            doc['previous'] = prev['ndcg']
-        if prune_old and len(docs) > 0:
-            for old in docs:
-                app.coll.delete_one(old)
-        results.append(doc)
-    results.sort(key=lambda r: r['ndcg'], reverse=True)
-    return write_html(results)
+        results.append(update_doc(netid))
+    results.sort(key=lambda r: r['score'], reverse=True)
+    cur_rank, cur_score = 0, math.inf
+    for cur_idx, doc in enumerate(results):
+        if doc['score'] < cur_score:
+            cur_rank = cur_idx + 1
+            cur_score = doc['score']
+        doc['rank'] = cur_rank
+    return results
 
-def insert_results(netid, alias, dataset, results, error):
+def calc_score(dataset, results, error):
     """
-    Score the student's submission and insert it if there wasn't a failure
-    beforehand. If there was a failure, store the reason so it can be displayed
-    on the leaderboard.
+    Calculate IR eval score for the given results list and dataset while
+    checking for potential errors.
     """
-    doc = {'netid': netid, 'dataset': dataset, 'alias': alias, 'ndcg': -1.0,
-           'error': None}
-    retval = True
-    if results is None or error is not None:
-        doc['error'] = error
-        doc['results'] = None
-        retval = False
-    elif len(results) != app.num_queries[dataset]:
-        msg = "Got {} queries, expected {}".format(len(results),
-                                                   app.num_queries[dataset])
-        doc['error'] = msg
-        doc['results'] = None
-        retval = False
-    else:
-        ndcg = 0.0
-        query_start = app.query_start[dataset]
-        for query_num, result in enumerate(results):
-            result = [tuple(elem) for elem in result]
-            ndcg += app.ir_eval[dataset].ndcg(result, query_num + query_start,
-                                              app.top_k[dataset])
-        doc['ndcg'] = ndcg / app.num_queries[dataset]
-    app.coll.insert_one(doc)
-    return retval
+    res = {'score': -math.inf, 'error': error}
+    if error:
+        return res
+    num_queries = app.num_queries[dataset]
+    if len(results) != num_queries:
+        msg = "Got {} queries, expected {}".format(len(results), num_queries)
+        res['error'] = msg
+        return res
+    ndcg = 0.0
+    query_start = app.query_start[dataset]
+    for query_num, result in enumerate(results):
+        result = [tuple(elem) for elem in result]
+        ndcg += app.ir_eval[dataset].ndcg(result, query_num + query_start,
+                                          app.top_k[dataset])
+    res['score'] = ndcg / app.num_queries[dataset]
+    return res
 
 @app.route('/api', methods=['POST'])
 def compute_ndcg():
@@ -112,22 +101,24 @@ def compute_ndcg():
     netid = get_netid(token)
     resp = {'submission_success': True}
     datasets = set(r['dataset'] for r in result_arr)
-    errors = []
+    scores, errors = {}, []
     if datasets != app.datasets:
-        errors.append("Mismatched datasets: {} vs {}".format(datasets,
-                                                             app.datasets))
+        errors.append("Wrong datasets: {} vs {}".format(datasets, app.datasets))
         resp['submission_success'] = False
     elif netid is None:
-        resp['submission_success'] = False
         errors.append('Failed to obtain netid from GitLab')
+        resp['submission_success'] = False
     else:
         for entry in result_arr:
-            success = insert_results(netid, alias, entry['dataset'],
-                                     entry['results'], entry['error'])
-            if not success:
-                errors.append("{}: {}".format(entry['dataset'], entry['error']))
+            cur_dset = entry['dataset']
+            score = calc_score(cur_dset, entry['results'], entry['error'])
+            scores[cur_dset] = score
+            if score['error']:
+                errors.append("{}: {}".format(cur_dset, score['error']))
                 resp['submission_success'] = False
     resp['error'] = '; '.join(errors) if len(errors) > 0 else None
+    doc = {'netid': netid, 'alias': alias, 'dataset_scores': scores}
+    app.coll.insert_one(doc)
     return Response(json.dumps(resp), status=200, mimetype='application/json')
 
 @app.route('/')
@@ -136,7 +127,7 @@ def root():
     Recalculates the latest scores and displays them.
     """
     return render_template('index.html', datasets=app.datasets,
-            top_k=app.top_k, participants=[])
+                           top_k=app.top_k, participants=update_scores())
 
 def load_config():
     """
