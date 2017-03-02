@@ -131,7 +131,8 @@ def root():
     Recalculates the latest scores and displays them.
     """
     return render_template('index.html', datasets=app.datasets,
-                           top_k=app.top_k, participants=update_scores())
+                           top_k=app.top_k, participants=update_scores(),
+                           competition_name=app.competition_name)
 
 def load_config(cfg_path):
     """
@@ -142,6 +143,7 @@ def load_config(cfg_path):
     app.datasets = set()
     with open(cfg_path) as infile:
         cfg = pytoml.load(infile)
+    app.competition_name = cfg['competition-name']
     for dset in cfg['datasets']:
         name = dset['name']
         app.ir_eval[name] = metapy.index.IREval(dset['config'])
