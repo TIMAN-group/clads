@@ -23,9 +23,9 @@ def update_doc(netid):
     """
     Creates a single row entry for the results table.
     """
-    docs = list(app.coll.find({'netid': netid}).sort([('_id', -1)]))
+    docs = list(app.coll.find({'netid': netid}).sort([('_id', -1)]).limit(2))
     doc = docs.pop(0)
-    doc['num_submissions'] = len(docs) + 1
+    doc['num_submissions'] = app.coll.count({'netid': netid})
     prev_doc = None
     if len(docs) > 0:
         prev_doc = docs.pop(0)
