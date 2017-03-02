@@ -133,14 +133,14 @@ def root():
     return render_template('index.html', datasets=app.datasets,
                            top_k=app.top_k, participants=update_scores())
 
-def load_config():
+def load_config(cfg_path):
     """
     Read the leaderboard config file, which specifies dataset-specific
     information.
     """
     app.ir_eval, app.top_k, app.num_queries, app.query_start = {}, {}, {}, {}
     app.datasets = set()
-    with open(sys.argv[1]) as infile:
+    with open(cfg_path) as infile:
         cfg = pytoml.load(infile)
     for dset in cfg['datasets']:
         name = dset['name']
@@ -157,7 +157,7 @@ if __name__ == '__main__':
     if len(sys.argv) != 2:
         print("Usage: python {} datasets.toml".format(sys.argv[0]))
         sys.exit(1)
-    load_config()
+    load_config(sys.argv[1])
     app.client = MongoClient()
     app.coll = app.client['competition']['results']
     app.run(debug=True)
