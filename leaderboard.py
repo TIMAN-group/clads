@@ -115,9 +115,14 @@ def compute_ndcg():
             if score['error']:
                 errors.append("{}: {}".format(cur_dset, score['error']))
                 resp['submission_success'] = False
+
     resp['error'] = '; '.join(errors) if len(errors) > 0 else None
-    doc = {'netid': netid, 'alias': alias, 'dataset_scores': scores}
-    app.coll.insert_one(doc)
+
+    # only insert document if it's well formed
+    if scores.keys() == app.datasets and netid is not None:
+        doc = {'netid': netid, 'alias': alias, 'dataset_scores': scores}
+        app.coll.insert_one(doc)
+
     return Response(json.dumps(resp), status=200, mimetype='application/json')
 
 @app.route('/')
