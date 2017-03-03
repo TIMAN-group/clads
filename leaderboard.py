@@ -4,6 +4,7 @@ import math
 import metapy
 import requests
 import pytoml
+import pytz
 
 from flask import Flask, request, Response, render_template
 app = Flask(__name__, static_folder='.', static_url_path='')
@@ -29,7 +30,7 @@ def update_doc(netid):
     prev_doc = None
     if len(docs) > 0:
         prev_doc = docs.pop(0)
-    gen_time = doc['_id'].generation_time
+    gen_time = doc['_id'].generation_time.astimezone(app.timezone)
     doc['last_run'] = gen_time.strftime('%Y-%m-%d | %H:%M:%S')
     overall_score, overall_prev = 0.0, 0.0
     for dset, vals in doc['dataset_scores'].items():
@@ -162,4 +163,5 @@ if __name__ == '__main__':
     load_config(sys.argv[1])
     app.client = MongoClient()
     app.coll = app.client['competition']['results']
+    app.timezone = pytz.timezone('America/Chicago')
     app.run(debug=True)
