@@ -68,7 +68,11 @@
         </thead>
         <tbody>
           {% for participant in participants %}
+          {% if participant.is_baseline %}
+          <tr class="success">
+          {% else %}
           <tr>
+          {% endif %}
             <td>{{ participant.rank }}</td>
             <td>{{ participant.alias | truncate(25) | e }}</td>
             <td>{{ participant.score }}</td>
