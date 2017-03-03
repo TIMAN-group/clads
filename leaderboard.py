@@ -145,6 +145,7 @@ def load_config(cfg_path):
     with open(cfg_path) as infile:
         cfg = pytoml.load(infile)
     app.competition_name = cfg['competition-name']
+    app.timezone = pytz.timezone(cfg['timezone'])
     for dset in cfg['datasets']:
         name = dset['name']
         app.ir_eval[name] = metapy.index.IREval(dset['config'])
@@ -163,5 +164,4 @@ if __name__ == '__main__':
     load_config(sys.argv[1])
     app.client = MongoClient()
     app.coll = app.client['competition']['results']
-    app.timezone = pytz.timezone('America/Chicago')
     app.run(debug=True)

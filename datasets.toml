@@ -1,4 +1,5 @@
 competition-name = "Search Engine Competition"
+timezone = "America/Chicago"
 
 [[datasets]]
 name = "cranfield"
