@@ -76,10 +76,10 @@
             <td>{{ participant.rank }}</td>
             <td>{{ participant.alias | truncate(25) | e }}</td>
             <td>{{ participant.score }}</td>
-            <td>{{ participant.prev_score }}</td>
+            <td><em>{{ participant.prev_score }}</em></td>
             {% for dataset in datasets %}
             <td>{{ participant.dataset_scores[dataset].score }}</td>
-            <td>{{ participant.dataset_scores[dataset].prev_score }}</td>
+            <td><em>{{ participant.dataset_scores[dataset].prev_score }}</em></td>
             {% endfor %}
             <td>{{ participant.last_run }}</td>
             <td>{{ participant.num_submissions }}</td>
