@@ -50,7 +50,7 @@
             <th rowspan="2"><strong>Alias</strong></th>
             <th colspan="2" scope="colgroup"><strong>Overall Score</strong></th>
             {% for dataset in datasets %}
-            <th colspan="2" scope="colgroup"><strong>{{ dataset }}</strong></th>
+            <th colspan="2" scope="colgroup"><strong>{{ dataset }} ({{ weight[dataset] }})</strong></th>
             {% endfor %}
             <th rowspan="2"><strong>Updated</strong></th>
             <th rowspan="2"><strong>Submissions</strong></th>
@@ -75,11 +75,11 @@
           {% endif %}
             <td>{{ participant.rank }}</td>
             <td>{{ participant.alias | truncate(25) | e }}</td>
-            <td>{{ participant.score }}</td>
-            <td><em>{{ participant.prev_score }}</em></td>
+            <td>{{ participant.score | round(4) }}</td>
+            <td><em>{{ participant.prev_score | round(4) }}</em></td>
             {% for dataset in datasets %}
-            <td>{{ participant.dataset_scores[dataset].score }}</td>
-            <td><em>{{ participant.dataset_scores[dataset].prev_score }}</em></td>
+            <td>{{ participant.dataset_scores[dataset].score | round(4) }}</td>
+            <td><em>{{ participant.dataset_scores[dataset].prev_score | round(4) }}</em></td>
             {% endfor %}
             <td>{{ participant.last_run }}</td>
             <td>{{ participant.num_submissions }}</td>

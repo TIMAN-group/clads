@@ -34,22 +34,21 @@ def update_doc(netid):
     doc['last_run'] = gen_time.strftime('%Y-%m-%d | %H:%M:%S')
     overall_score, overall_prev = 0.0, 0.0
     for dset, vals in doc['dataset_scores'].items():
-        overall_score += vals['score']
+        overall_score += vals['score'] * app.weight[dset]
         doc['dataset_scores'][dset]['prev_score'] = -math.inf
         # If there was an error, show error text instead of -inf score.
         if vals['error']:
             doc['dataset_scores'][dset]['score'] = vals['error']
         else:
-            doc['dataset_scores'][dset]['score'] = round(vals['score'], 4)
+            doc['dataset_scores'][dset]['score'] = vals['score']
         if prev_doc:
             prev_score = prev_doc['dataset_scores'][dset]['score']
-            overall_prev += prev_score
-            doc['dataset_scores'][dset]['prev_score'] = round(prev_score, 4)
-    doc['score'] = round(overall_score / len(doc['dataset_scores']), 4)
+            overall_prev += prev_score * app.weight[dset]
+            doc['dataset_scores'][dset]['prev_score'] = prev_score
+    doc['score'] = overall_score
     doc['prev_score'] = -math.inf
     if prev_doc:
-        prev_score = overall_prev / len(prev_doc['dataset_scores'])
-        doc['prev_score'] = round(prev_score, 4)
+        doc['prev_score'] = overall_prev
     return doc
 
 def update_scores():
@@ -132,7 +131,8 @@ def root():
     Recalculates the latest scores and displays them.
     """
     return render_template('index.html', datasets=app.datasets,
-                           top_k=app.top_k, participants=update_scores(),
+                           top_k=app.top_k, weight=app.weight,
+                           participants=update_scores(),
                            competition_name=app.competition_name)
 
 def load_config(cfg_path):
@@ -140,7 +140,7 @@ def load_config(cfg_path):
     Read the leaderboard config file, which specifies dataset-specific
     information.
     """
-    app.ir_eval, app.top_k, app.num_queries, app.query_start = {}, {}, {}, {}
+    app.ir_eval, app.top_k, app.num_queries, app.query_start, app.weight = {}, {}, {}, {}, {}
     app.datasets = set()
     with open(cfg_path) as infile:
         cfg = pytoml.load(infile)
@@ -152,6 +152,7 @@ def load_config(cfg_path):
         app.top_k[name] = dset['top-k']
         app.num_queries[name] = dset['num-queries']
         app.query_start[name] = dset['query-id-start']
+        app.weight[name] = dset['weight']
         app.datasets.add(name)
     num = len(app.datasets)
     print("Loaded {} dataset{}: {}".format(num, '' if num == 1 else 's',
