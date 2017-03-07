@@ -78,7 +78,11 @@
             <td>{{ participant.score | round(4) }}</td>
             <td><em>{{ participant.prev_score | round(4) }}</em></td>
             {% for dataset in datasets %}
+            {% if participant.dataset_scores[dataset].error %}
+            <td>{{ participant.dataset_scores[dataset].error }}</td>
+            {% else %}
             <td>{{ participant.dataset_scores[dataset].score | round(4) }}</td>
+            {% endif %}
             <td><em>{{ participant.dataset_scores[dataset].prev_score | round(4) }}</em></td>
             {% endfor %}
             <td>{{ participant.last_run }}</td>

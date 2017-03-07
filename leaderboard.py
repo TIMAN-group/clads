@@ -38,7 +38,7 @@ def update_doc(netid):
         doc['dataset_scores'][dset]['prev_score'] = -math.inf
         # If there was an error, show error text instead of -inf score.
         if vals['error']:
-            doc['dataset_scores'][dset]['score'] = vals['error']
+            doc['dataset_scores'][dset]['error'] = vals['error']
         else:
             doc['dataset_scores'][dset]['score'] = vals['score']
         if prev_doc:
