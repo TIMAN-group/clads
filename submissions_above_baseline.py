@@ -12,9 +12,12 @@ def num_above_baseline(netid):
             overall_score += vals['score'] * app.weight[dset]
         doc['score'] = overall_score
 
-    pos = next(i for i, doc in enumerate(docs) if doc['score'] >= 0.3702)
-    docs = docs[pos:]
-    return len(docs)
+    try:
+        pos = next(i for i, doc in enumerate(docs) if doc['score'] >= 0.3702)
+        docs = docs[pos:]
+        return len(docs)
+    except StopIteration:
+        return 0
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
