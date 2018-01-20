@@ -30,4 +30,4 @@ if __name__ == '__main__':
         writer = csv.writer(csvfile)
         writer.writerow(['netid', 'count-above'])
         for netid in app.coll.find().distinct('netid'):
-            writer.writerow(netid, num_above_baseline(netid))
+            writer.writerow([netid, num_above_baseline(netid)])
