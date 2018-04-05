@@ -2,6 +2,8 @@
 layout: default
 ---
 
+![system architecture](design-figure.svg)
+
 # CLaDS: A Cloud Based Lab for Data Science
 
 The rise of the "big data" era has created a pressing demand for educating
