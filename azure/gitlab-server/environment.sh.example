@@ -1,0 +1,2 @@
+#!/bin/bash
+export GITLAB_HOSTNAME="myhostname.azurelocation.cloudapp.azure.com"

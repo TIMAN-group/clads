@@ -1,35 +1,8 @@
----
-layout: default
----
+# `docker-machine` Scripts for Microsoft Azure
 
-![system architecture](design-figure.svg)
-
-# CLaDS: A Cloud Based Lab for Data Science
-
-The rise of the "big data" era has created a pressing demand for educating
-many data scientists and engineers quickly at low cost.  It is essential
-they learn by working on assignments that involve real world data sets to
-develop the skills needed to be successful in the workplace.  However,
-enabling instructors to flexibly deliver all kinds of data science
-assignments using real world data sets to large numbers of learners (both
-on-campus and off-campus) at low cost is a significant open challenge.
-
-To address this emerging challenge generally, CLaDS has been developed to
-enable many learners around
-the world to work on real-world data science problems without having to
-move or otherwise distribute prohibitively large data sets. Leveraging
-version control and continuous integration, CLaDS provides a general
-infrastructure to enable any instructor to conveniently deliver any
-hands-on data science assignment that uses large real world data sets to as
-many learners as our cloud-computing infrastructure allows at very low
-cost.
-
-# Deploying CLaDS for Your Own Class
-
-These instructions below will be specific to Microsoft Azure, but they
-should be able to be generalized to any cloud provider supported by
-`docker-machine` by substituting the Azure-specific arguments in the set up
-scripts with the required arguments for your preferred cloud provider.
+The scripts in this folder allow you to spawn an instance of CLaDS in
+Microsoft Azure. You will need to follow the instructions here or at [our
+website][clads-website] for getting things set up.
 
 ## Requirements
 
@@ -390,10 +363,6 @@ documentation][gitlab-ci-docs] for how to set this up.
 On the build workers, your file share you created in step 5 will be mounted
 _read only_ as `/data`, so the build workers can use any files you have
 uploaded to the file share in their build scripts.
-
-## Assignment Examples and Leaderboards
-
-_Coming soon!_
 
 ## Common Issues
 

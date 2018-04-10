@@ -1,0 +1,5 @@
+#!/bin/bash
+export AZURE_SUBSCRIPTION_ID="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+export AZURE_CLIENT_ID="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+export AZURE_CLIENT_SECRET="xxxxxxxxxxxx+xxxxxxxx/xxxx/xxxxxxxxxxxxxxxx="
+export AZURE_LOCATION="westcentralus"

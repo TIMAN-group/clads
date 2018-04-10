@@ -1,0 +1,42 @@
+concurrent = XX
+check_interval = 0
+
+[[runners]]
+  name = "XXXXX"
+  url = "https://yourname.azurelocation.cloudapp.azure.com""
+  token = "XXXX"
+  executor = "docker+machine"
+  limit = XX
+  [runners.docker]
+    tls_verify = false
+    image = "python:3"
+    privileged = false
+    disable_cache = false
+    volumes = ["/data:/data:ro"]
+  [runners.cache]
+    Type = "s3"
+    ServerAddress = "10.0.0.5:9005"
+    AccessKey = "XXXXX"
+    SecretKey = "XXXXX"
+    BucketName = "runner"
+    Insecure = true
+  [runners.machine]
+    IdleCount = 0
+    IdleTime = XXXX
+    MachineDriver = "azure"
+    MachineName = "clads-runner-autoscale-%s"
+    MachineOptions = [
+        "azure-subscription-id=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        "azure-client-id=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        "azure-client-secret=xxxxxxxxxxxxxxxxxxxxx/xxxx/xxxxxxxxxxxxxxxx=",
+        "azure-location=YOURAZURELOCATION",
+        "azure-size=YOUR_AZURE_VM_SIZE",
+        "azure-resource-group=CLaDS",
+        "azure-vnet=CLaDS-vnet",
+        "azure-subnet=default",
+        "azure-subnet-prefix=10.0.0.0/24",
+        "azure-custom-data=/etc/gitlab-runner/cloud-init.txt",
+        "engine-registry-mirror=http://10.0.0.6:6000"
+    ]
+    OffPeakIdleCount = 0
+    OffPeakIdleTime = 0
