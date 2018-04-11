@@ -40,4 +40,38 @@ bindings. The important files are:
    execution time. This is for accident prevention, not for Machiavellian
    students.
 
+# Instructions for Students
+The students will need to do some setup to configure their desired name on
+the leaderboard (defaults to "Anonymous") as well as tie their results to
+their Gitlab username (for grading purposes).
+
+## Competition Setup
+This is a two-step process. First, we'll make an access token for your user
+(this is submitted along with the competition results for authentication),
+and then set the needed pipeline variables to submit your results to the
+leaderboard.
+
+### Making an Access Token
+Go to the upper right hand corner and click the drop-down and go to
+"Settings". From there, go to "Access Tokens". Create a new token (it can
+be called whatever you'd like, but I used "Competition API"), and give it
+the **read_user** scope. Then, click "Create personal access token". There
+will be a box at the top of the screen that appears with the access token.
+**Make sure to copy this to your clipboard as you won't be able to see it
+again!**
+
+### Configuring Pipeline Variables
+Now that you have your access token copied to your clipboard, go back to
+your fork of the repository. Click on "Settings", and then "Pipelines".
+Look for the "**Secret variables**" section. We'll need to add two
+variables. The first will be called `GITLAB_API_TOKEN`. Set the value to
+the access token you copied before.
+
+Finally, create another variable called `COMPETITION_ALIAS` and set that to
+whatever you'd like your entry to be named on the leaderboard.
+
+Once both of these variables are set, you should be ready to go! Each push
+to this repository should start a build job that runs your code and submits
+the results to the leaderboard to be judged.
+
 [metapy]: https://github.com/meta-toolkit/metapy
