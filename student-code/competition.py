@@ -16,7 +16,7 @@ class TestRanker(unittest.TestCase):
         # APNews
         '/data/apnews/config.toml'
     ]
-    submission_url = 'http://0.0.0.0:5000/api'
+    submission_url = 'http://10.0.0.9/api'
     top_k = 10
 
     def test_creation(self):
