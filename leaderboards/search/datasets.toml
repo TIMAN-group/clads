@@ -1,0 +1,18 @@
+competition-name = "Search Engine Competition"
+timezone = "America/Chicago"
+
+[[datasets]]
+name = "cranfield"
+config = "cranfield-config.toml"
+top-k = 10
+num-queries = 225
+query-id-start = 1
+weight = 0.3
+
+[[datasets]]
+name = "apnews"
+config = "apnews-config.toml"
+top-k = 10
+num-queries = 100
+query-id-start = 0
+weight = 0.7

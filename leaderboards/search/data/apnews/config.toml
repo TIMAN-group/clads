@@ -1,0 +1,18 @@
+prefix = "/data"
+stop-words = "/data/stopwords.txt"
+
+dataset = "apnews"
+corpus = "line.toml"
+index = "/data/idx/apnews-idx"
+
+query-judgements = "/data/apnews/apnews-qrels.txt"
+
+[[analyzers]]
+method = "ngram-word"
+ngram = 1
+filter = "default-unigram-chain"
+
+[query-runner]
+query-path = "/data/apnews/apnews-queries.txt"
+query-id-start = 0
+timeout = 120
