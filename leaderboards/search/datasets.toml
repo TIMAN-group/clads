@@ -3,7 +3,7 @@ timezone = "America/Chicago"
 
 [[datasets]]
 name = "cranfield"
-config = "cranfield-config.toml"
+config = "/data/cranfield/config.toml"
 top-k = 10
 num-queries = 225
 query-id-start = 1
@@ -11,7 +11,7 @@ weight = 0.3
 
 [[datasets]]
 name = "apnews"
-config = "apnews-config.toml"
+config = "/data/apnews/config.toml"
 top-k = 10
 num-queries = 100
 query-id-start = 0
