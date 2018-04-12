@@ -50,6 +50,31 @@ docker-compose up -d --no-deps --build leaderboard
 This should rebuild the container on the remote machine and restart the
 leaderboard with the new files.
 
+## Adding a Baseline Submission
+
+The leaderboard supports denoting specific submissions as "Baseline"
+submissions; this can be used to create a hybrid assignment where the goal
+is to beat the baseline solution, but then where extra credit is granted to
+top performers on the leaderboard to encourage friendly competition.
+
+To do so, follow the same procedure as for submitting as a student under a
+different account on the Gitlab instance (such as under a TA account).
+Then, you can flag the submission as a baseline like so:
+
+```bash
+eval $(docker-machine env clads-search-leaderboard)
+docker-compose exec mongo \
+    mongo competition --eval \
+    "db.results.update( \
+        {'username': 'BASELINE-USERNAME'}, \
+        {$set: {'is_baseline': true}}, \
+        {'multi': true}
+    );"
+```
+
+To un-flag submissions, simply change the `true` to `false` in the above
+query.
+
 # Local Use
 ## Set up database
 
