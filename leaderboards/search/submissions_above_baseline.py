@@ -28,7 +28,7 @@ if __name__ == '__main__':
     app.client = MongoClient(app.mongodb_host)
     app.coll = app.client['competition']['results']
 
-    to_beat = float(sys.argv[2]
+    to_beat = float(sys.argv[2])
 
     print("Writing results to {}...".format(sys.argv[3]))
     with open(sys.argv[3], 'w', newline='') as csvfile:
