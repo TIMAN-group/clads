@@ -3,8 +3,8 @@ import sys
 from leaderboard import app, load_config, update_scores
 from pymongo import MongoClient
 
-def num_above_baseline(netid):
-    docs = list(app.coll.find({'netid': netid}).sort([('_id', -1)]))
+def num_above_baseline(username):
+    docs = list(app.coll.find({'username': username}).sort([('_id', -1)]))
 
     for doc in docs:
         overall_score = 0.0
@@ -31,6 +31,6 @@ if __name__ == '__main__':
     print("Writing results to {}...".format(sys.argv[2]))
     with open(sys.argv[2], 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(['netid', 'count-above'])
-        for netid in app.coll.find().distinct('netid'):
-            writer.writerow([netid, num_above_baseline(netid)])
+        writer.writerow(['username', 'count-above'])
+        for username in app.coll.find().distinct('username'):
+            writer.writerow([username, num_above_baseline(username)])

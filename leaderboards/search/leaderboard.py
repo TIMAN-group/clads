@@ -12,7 +12,7 @@ from pymongo import MongoClient
 
 GITLAB_API_URL = 'https://gitlab.textdata.org/api/v3'
 
-def get_netid(token):
+def get_username(token):
     try:
         r = requests.get("{}/user".format(GITLAB_API_URL),
                          headers={'PRIVATE-TOKEN': token})
@@ -20,13 +20,13 @@ def get_netid(token):
     except:
         return None
 
-def update_doc(netid):
+def update_doc(username):
     """
     Creates a single row entry for the results table.
     """
-    docs = list(app.coll.find({'netid': netid}).sort([('_id', -1)]).limit(2))
+    docs = list(app.coll.find({'username': username}).sort([('_id', -1)]).limit(2))
     doc = docs.pop(0)
-    doc['num_submissions'] = app.coll.count({'netid': netid})
+    doc['num_submissions'] = app.coll.count({'username': username})
     prev_doc = None
     if len(docs) > 0:
         prev_doc = docs.pop(0)
@@ -56,8 +56,8 @@ def update_scores():
     Refreshes the results page with the latest info from the db.
     """
     results = []
-    for netid in app.coll.find().distinct('netid'):
-        results.append(update_doc(netid))
+    for username in app.coll.find().distinct('username'):
+        results.append(update_doc(username))
     results.sort(key=lambda r: r['score'], reverse=True)
     cur_rank, cur_score = 0, math.inf
     for cur_idx, doc in enumerate(results):
@@ -97,15 +97,15 @@ def compute_ndcg():
     """
     jdata = request.json
     token, alias, result_arr = jdata['token'], jdata['alias'], jdata['results']
-    netid = get_netid(token)
+    username = get_username(token)
     resp = {'submission_success': True}
     datasets = set(r['dataset'] for r in result_arr)
     scores, errors = {}, []
     if datasets != app.datasets:
         errors.append("Wrong datasets: {} vs {}".format(datasets, app.datasets))
         resp['submission_success'] = False
-    elif netid is None:
-        errors.append('Failed to obtain netid from GitLab')
+    elif username is None:
+        errors.append('Failed to obtain username from GitLab')
         resp['submission_success'] = False
     else:
         for entry in result_arr:
@@ -119,8 +119,8 @@ def compute_ndcg():
     resp['error'] = '; '.join(errors) if len(errors) > 0 else None
 
     # only insert document if it's well formed
-    if scores.keys() == app.datasets and netid is not None:
-        doc = {'netid': netid, 'alias': alias, 'dataset_scores': scores}
+    if scores.keys() == app.datasets and username is not None:
+        doc = {'username': username, 'alias': alias, 'dataset_scores': scores}
         app.coll.insert_one(doc)
 
     return Response(json.dumps(resp), status=200, mimetype='application/json')

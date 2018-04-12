@@ -8,12 +8,12 @@ def random_alias():
 if __name__ == '__main__':
     client = MongoClient()
     coll = client['competition']['results']
-    netids = ['bob', 'fred', 'billy', 'joe', 'sue', 'sally', 'ferdinand',
+    usernames = ['bob', 'fred', 'billy', 'joe', 'sue', 'sally', 'ferdinand',
               'augustus', 'leonard']
-    for netid in netids:
+    for username in usernames:
         alias = random_alias()
         ndcg = round(random.uniform(0, 1), 1)
-        coll.insert({'netid': netid,
+        coll.insert({'username': username,
                      'alias': alias,
                      'dataset_scores': {'cranfield': {'score': ndcg, 'error': None}}
                     })

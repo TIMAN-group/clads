@@ -17,6 +17,6 @@ if __name__ == '__main__':
     print("Writing results to {}...".format(sys.argv[2]))
     with open(sys.argv[2], 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(['netid', 'rank', 'overall_score'])
+        writer.writerow(['username', 'rank', 'overall_score'])
         for doc in docs:
-            writer.writerow([doc['netid'], doc['rank'], doc['score']])
+            writer.writerow([doc['username'], doc['rank'], doc['score']])
