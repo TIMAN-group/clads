@@ -171,7 +171,7 @@ On the remote machine, you can edit Gitlab's configuration file like so:
 
 ```bash
 # on the remote server
-vim /srv/gitlab/config/gitlab.rb
+sudo vim /srv/gitlab/config/gitlab.rb
 ```
 
 There are two things you will want to configure here. First, you will
@@ -180,9 +180,16 @@ can [follow the guidelines here][gitlab-smtp] to set that up.
 
 Next, you will want to [configure Gitlab to use HTTPS][gitlab-https]. We
 recommend following the "Free and automated HTTPS with Let's Encrypt" guide
-there.
+there; specifically, you'll want to add the following lines:
 
-Finally, add the following line to the configuration file:
+```ruby
+external_url https://YOURHOSTNAME.azureregion.cloudapp.azure.com
+letsencrypt['enable'] = true
+letsencrypt['contact_emails'] = ['foo@email.com'] # Optional
+```
+
+Finally, add the following line to the configuration file as well (as the
+default SSH port will already be taken):
 
 ```ruby
 gitlab_rails['gitlab_shell_ssh_port'] = 222
@@ -199,7 +206,7 @@ reconfigure Gitlab:
 Once this command is complete, you should be all set! You should return to
 your browser and refresh the page at your configured DNS name---you should
 now be using `https://` in the URL, at which point you can go ahead and set
-your initial admin password.
+your initial admin password. Note that the administrator user is `root`.
 
 ## 5. Configure Dataset Storage
 
