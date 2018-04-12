@@ -80,6 +80,9 @@ true usernames attached. This can done with the `results.py` script, which
 can be run as follows:
 
 ```bash
+# if you are _not_ using docker-machine, skip this line
+eval $(docker-machine env clads-search-leaderboard)
+
 # write out a CSV file with competition results to artifacts/results.csv
 docker-compose exec leaderboard \
     python results.py datasets.toml artifacts/results.csv
@@ -98,6 +101,9 @@ see just how many times students submitted after they successfully beat the
 baseline submission.
 
 ```bash
+# if you are _not_ using docker-machine, skip this line
+eval $(docker-machine env clads-search-leaderboard)
+
 # write out a CSV file with the number of submissions above a threshold to
 # artifacts/submissions.csv
 docker-compose exec leaderboard \
