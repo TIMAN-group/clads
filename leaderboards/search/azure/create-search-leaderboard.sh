@@ -14,6 +14,6 @@ docker-machine create \
     clads-search-leaderboard
 
 eval $(docker-machine env clads-search-leaderboard)
-docker-compose up
+docker-compose up -d
 docker-compose exec mongo \
     mongo competition --eval "db.results.createIndex({'username': 1})"
