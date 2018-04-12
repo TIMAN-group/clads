@@ -20,9 +20,11 @@ Microsoft Azure. To use this, you will need to have `docker`,
 `docker-compose`.
 
 Once you have the dependencies installed, make sure you update the
-`datasets.toml` file to properly refer to the datasets to be used. Then,
-update the `cloud-init.txt` file to properly mount your dataset share on
-the leaderboard server:
+`datasets.toml` file to properly refer to the datasets to be used as well
+as to specify your Gitlab instance's URL.
+
+Then, update the `cloud-init.txt` file to properly mount your dataset share
+on the leaderboard server:
 
 ```bash
 cp cloud-init.txt.example cloud-init.txt
