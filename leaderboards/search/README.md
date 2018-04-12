@@ -11,7 +11,7 @@ leaderboard server. In the `data` folder you can find some example
 configuration files that can be used to run the student code to produce
 results for submission to the leaderboard server.
 
-# Production Deployment
+# Deployment
 
 We have provided a `docker-compose.yml` and a script for deploying to
 Microsoft Azure. To use this, you will need to have `docker`,
@@ -46,6 +46,7 @@ Should you need to update the code/configuration after deployment, simply
 edit the files locally and then execute the following command:
 
 ```bash
+# if you are _not_ using docker-machine, skip this first line
 eval $(docker-machine env clads-search-leaderboard)
 docker-compose up -d --no-deps --build leaderboard
 ```
@@ -65,43 +66,48 @@ different account on the Gitlab instance (such as under a TA account).
 Then, you can flag the submission as a baseline like so:
 
 ```bash
+# if you are _not_ using docker-machine, skip this first line
 eval $(docker-machine env clads-search-leaderboard)
-docker-compose exec mongo \
-    mongo competition --eval \
-    "db.results.update( \
-        {'username': 'BASELINE-USERNAME'}, \
-        {$set: {'is_baseline': true}}, \
-        {'multi': true}
-    );"
+baseline-flag.sh BASELINE-USERNAME true
 ```
 
-To un-flag submissions, simply change the `true` to `false` in the above
-query.
+To un-flag submissions, simply change the `true` to `false` above.
 
-# Local Use
-## Set up database
+## Getting Final Results List
+
+For grading purposes you may require a list of the leaderboard with the
+true usernames attached. This can done with the `results.py` script, which
+can be run as follows:
 
 ```bash
-mkdir db
-mongod --dbpath db --fork
-mongo
-> use competition
-> db.createCollection('results')
-> db.results.createIndex({'netid': 1})
-> exit
-mongod --shutdown --dbpath db
+# write out a CSV file with competition results to artifacts/results.csv
+docker-compose exec leaderboard \
+    python results.py datasets.toml artifacts/results.csv
+
+# if running docker-machine, fetch the file locally with:
+docker-machine scp \
+    clads-search-leaderboard:/srv/leaderboard/artifacts/results.csv .
 ```
 
-## Run
+## Fun Statistics: Submissions Above Threshold
+
+The script `submissions_above_baseline.py` can be used to get the number of
+submissions made by a student after they first successfully passed a
+certain score threshold. If you set that score to your baseline, you can
+see just how many times students submitted after they successfully beat the
+baseline submission.
 
 ```bash
-mongod --dbpath db --fork
-python seed.py
-python leaderboard.py
-```
+# write out a CSV file with the number of submissions above a threshold to
+# artifacts/submissions.csv
+docker-compose exec leaderboard \
+    python submissions_above_baseline.py datasets.toml SCORE_TO_BEAT \
+    artifacts/submissions.csv
 
-Add changes by calling `seed.py` again or run `unit_test.py` and refresh the
-leaderboard page.
+# if running docker-machine, fetch the file locally with:
+docker-machine scp \
+    clads-search-leaderboard:/srv/leaderboard/artifacts/submissions.csv .
+```
 
 [metapy]: https://github.com/meta-toolkit/metapy
 [clads]: https://timan-group.github.io/clads/

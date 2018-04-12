@@ -9,7 +9,7 @@ if __name__ == '__main__':
         sys.exit(1)
 
     load_config(sys.argv[1])
-    app.client = MongoClient()
+    app.client = MongoClient(app.mongodb_host)
     app.coll = app.client['competition']['results']
 
     docs = update_scores()
