@@ -393,7 +393,15 @@ uploaded to the file share in their build scripts.
 
 ## Assignment Examples and Leaderboards
 
-_Coming soon!_
+CLaDS currently comes with two leaderboards: one for hosting a search
+competition, and one for hosting a (multiclass) classification competition.
+You can find the associated leaderboard server code, instructions on
+deploying a leaderboard, and the associated student skeleton code in the
+`leaderboards` folder.
+
+Specifically:
+- the [search competition leaderboard][search-leaderboard], and
+- the classification competition leaderboard (_coming soon_)
 
 ## Common Issues
 
@@ -451,3 +459,4 @@ _Coming soon!_
 [gitlab-smtp]: https://docs.gitlab.com/omnibus/settings/smtp.html
 [gitlab-https]: https://docs.gitlab.com/omnibus/settings/nginx.html#enable-https
 [gitlab-ci-docs]: https://docs.gitlab.com/ce/ci/quick_start/
+[search-leaderboard]: https://github.com/TIMAN-group/clads/tree/master/leaderboards/search
