@@ -14,7 +14,10 @@ results for submission to the leaderboard server.
 # Production Deployment
 
 We have provided a `docker-compose.yml` and a script for deploying to
-Microsoft Azure. To use this, you will need to have `docker`, `docker-machine` and `docker-compose` installed. Refer to the [docker-compose installation guide][docker-compose] for installing `docker-compose`.
+Microsoft Azure. To use this, you will need to have `docker`,
+`docker-machine` and `docker-compose` installed. Refer to the
+[docker-compose installation guide][docker-compose] for installing
+`docker-compose`.
 
 Once you have the dependencies installed, make sure you update the
 `datasets.toml` file to properly refer to the datasets to be used. Then,
