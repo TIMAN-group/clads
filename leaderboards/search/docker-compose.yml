@@ -7,7 +7,7 @@ services:
             dockerfile: ./docker/leaderboard/Dockerfile
         volumes:
             - "/data:/data:ro"
-            - "/srv/leaderboard/artifacts"
+            - "/srv/leaderboard/artifacts:/srv/leaderboard/artifacts"
         ports:
             - "8000:8000"
         links:
