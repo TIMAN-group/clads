@@ -1,6 +1,11 @@
 competition-name = "Search Engine Competition"
 timezone = "America/Chicago"
 
+# hostname for the server running the mongodb instance; when using
+# docker-compose this is "mongo", but when running it locally this is
+# likely "localhost" or "127.0.0.1"
+mongodb-host = "mongo"
+
 [[datasets]]
 name = "cranfield"
 config = "/data/cranfield/config.toml"

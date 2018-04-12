@@ -146,6 +146,7 @@ def load_config(cfg_path):
         cfg = pytoml.load(infile)
     app.competition_name = cfg['competition-name']
     app.timezone = pytz.timezone(cfg['timezone'])
+    app.mongodb_host = cfg['mongodb-host']
     for dset in cfg['datasets']:
         name = dset['name']
         app.ir_eval[name] = metapy.index.IREval(dset['config'])
@@ -163,6 +164,6 @@ if __name__ == '__main__':
         print("Usage: python {} datasets.toml".format(sys.argv[0]))
         sys.exit(1)
     load_config(sys.argv[1])
-    app.client = MongoClient()
+    app.client = MongoClient(app.mongodb_host)
     app.coll = app.client['competition']['results']
     app.run(debug=True)
