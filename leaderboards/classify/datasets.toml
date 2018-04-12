@@ -1,0 +1,33 @@
+competition-name = "Classification Competition"
+timezone = "America/Chicago"
+
+# URL to your Gitlab instance
+gitlab-url = "https://YOURHOSTNAME.azureregion.cloudapp.azure.com"
+
+# hostname for the server running the mongodb instance; when using
+# docker-compose this is "mongo", but when running it locally this is
+# likely "localhost" or "127.0.0.1"
+mongodb-host = "mongo"
+
+[[datasets]]
+name = "icnale-withheld"
+label-file = "data/icnale-labels.txt" # path to file of newline-separated
+                                 # document labels
+weight = 0.7
+[[datasets.metrics]]
+metric = "accuracy"
+weight = 0.5
+[[datasets.metrics]]
+metric = "f1_score"
+weight = 0.5
+
+[[datasets]]
+name = "twitter-geo-withheld"
+label-file = "data/twitter-labels.txt"
+weight = 0.3
+[[datasets.metrics]]
+metric = "precision"
+weight = 0.6
+[[datasets.metrics]]
+metric = "recall"
+weight = 0.4

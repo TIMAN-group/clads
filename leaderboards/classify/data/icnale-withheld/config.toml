@@ -1,0 +1,22 @@
+prefix = "/data"
+stop-words = "/data/stopwords.txt"
+
+dataset = "icnale-withheld"
+corpus = "line.toml"
+index = "icnale-idx"
+uninvert = true
+timeout = 240
+
+# below we specify the document id ranges for the training set and the
+# testing set
+#
+# the ids should be specified as a range [x, y]:
+# documents with ids >= x and ids < y (strictly less than!) will be
+# included. You can use -1 to denote the end of the list.
+training-set = [0, 4480]
+testing-set = [4480, -1]
+
+[[analyzers]]
+method = "ngram-word"
+ngram = 1
+filter = "default-unigram-chain"

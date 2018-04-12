@@ -1,0 +1,22 @@
+# This sets a cached directory for any python modules students want to
+# install. This directory will be repo-speciic (so each student gets
+# his/her own python module cache). This will speed up subsequent builds if
+# they are installing extra modules.
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/pip-cache"
+
+# This tells the GitLab CI runner to cache the pip-cache folder
+cache:
+  paths:
+    - "$CI_PROJECT_DIR/pip-cache"
+
+# This script is run before every job defined below. This is where students
+# should add any commands they want to run in the container to e.g. install
+# extra libraries they require.
+before_script:
+  - pip install metapy pytoml tqdm requests
+
+# uploads your results to the competition leaderboard
+competition:
+  script:
+    - python competition.py

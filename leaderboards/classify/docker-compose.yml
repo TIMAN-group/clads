@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+    leaderboard:
+        build:
+            context: .
+            dockerfile: ./docker/leaderboard/Dockerfile
+        volumes:
+            - "/data:/data:ro"
+            - "/srv/leaderboard/artifacts:/srv/leaderboard/artifacts"
+        ports:
+            - "8000:8000"
+        links:
+            - mongo
+        restart: always
+    mongo:
+        image: mongo:latest
+        volumes:
+            - "/srv/mongo/db:/data/db"
+        ports:
+            - "27017:27017"
+        restart: always
+    nginx:
+        build: ./docker/nginx
+        volumes:
+            - "/srv/nginx/log:/var/log/nginx/log"
+        ports:
+            - "80:80"
+        links:
+            - leaderboard
+        restart: always

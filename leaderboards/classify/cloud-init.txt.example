@@ -1,0 +1,6 @@
+#cloud-config
+runcmd:
+  - [ mkdir, /data ]
+
+mounts:
+  - [ //STORAGEACCOUNTNAME.file.core.windows.net/foldername, /data, "cifs", "vers=3.0,username=STORAGEACCOUNTNAME,password=XXXXXXX,dir_mode=0755,file_mode=0755" ]
