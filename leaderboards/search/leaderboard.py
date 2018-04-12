@@ -10,11 +10,9 @@ from flask import Flask, request, Response, render_template
 app = Flask(__name__, static_folder='.', static_url_path='')
 from pymongo import MongoClient
 
-GITLAB_API_URL = 'https://gitlab.textdata.org/api/v3'
-
 def get_username(token):
     try:
-        r = requests.get("{}/user".format(GITLAB_API_URL),
+        r = requests.get("{}/user".format(app.gitlab_api_url),
                          headers={'PRIVATE-TOKEN': token})
         return r.json()['username']
     except:
@@ -147,6 +145,7 @@ def load_config(cfg_path):
     app.competition_name = cfg['competition-name']
     app.timezone = pytz.timezone(cfg['timezone'])
     app.mongodb_host = cfg['mongodb-host']
+    app.gitlab_api_url = "{}/api/v3".format(cfg['gitlab-url'])
     for dset in cfg['datasets']:
         name = dset['name']
         app.ir_eval[name] = metapy.index.IREval(dset['config'])

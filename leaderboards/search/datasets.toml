@@ -1,6 +1,9 @@
 competition-name = "Search Engine Competition"
 timezone = "America/Chicago"
 
+# URL for your gitlab instance
+gitlab-url = "https://YOURHOSTNAME.azureregion.cloudapp.azure.com"
+
 # hostname for the server running the mongodb instance; when using
 # docker-compose this is "mongo", but when running it locally this is
 # likely "localhost" or "127.0.0.1"
