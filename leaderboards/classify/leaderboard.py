@@ -155,6 +155,7 @@ def load_config(cfg_path):
         cfg = pytoml.load(infile)
     app.competition_name = cfg['competition-name']
     app.timezone = pytz.timezone(cfg['timezone'])
+    app.mongodb_host = cfg['mongodb-host']
     app.gitlab_api_url = "{}/api/v3".format(cfg['gitlab-url'])
     for dset in cfg['datasets']:
         name = dset['name']
