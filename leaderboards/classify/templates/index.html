@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ competition_name }}</title>
   <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="bootstrap/css/hint.base.min.css">
   <script src="bootstrap/js/bootstrap.js"></script>
 </head>
 
@@ -50,7 +51,7 @@
             <th rowspan="2"><strong>Alias</strong></th>
             <th colspan="2" scope="colgroup"><strong>Overall Score</strong></th>
             {% for dataset in datasets %}
-            <th colspan="2" scope="colgroup"><strong>{{ dataset }} ({{ weight[dataset] }})</strong></th>
+            <th colspan="{{ (metrics[dataset] | count) * 2 }}" scope="colgroup"><strong>{{ dataset }} ({{ weight[dataset] }})</strong></th>
             {% endfor %}
             <th rowspan="2"><strong>Updated</strong></th>
             <th rowspan="2"><strong>Submissions</strong></th>
@@ -61,8 +62,10 @@
             <th scope="col">Previous</th>
             <!-- datasets -->
             {% for dataset in datasets %}
-            <th scope="col">NDCG@{{ top_k[dataset] }}</th>
+            {% for metric in metrics[dataset] %}
+            <th scope="col">{{ metric.metric | capitalize }} ({{ metric.weight }})</th>
             <th scope="col">Previous</th>
+            {% endfor %}
             {% endfor %}
           </tr>
         </thead>
@@ -78,12 +81,14 @@
             <td>{{ participant.score | round(4) }}</td>
             <td><em>{{ participant.prev_score | round(4) }}</em></td>
             {% for dataset in datasets %}
+            {% for metric in metrics[dataset] %}
             {% if participant.dataset_scores[dataset].error %}
-            <td>{{ participant.dataset_scores[dataset].error }}</td>
+            <td><span aria-label="{{ participant.dataset_scores[dataset].error }}" class="hint--top">Error (hover)</span></td>
             {% else %}
-            <td>{{ participant.dataset_scores[dataset].score | round(4) }}</td>
+            <td>{{ participant.dataset_scores[dataset].score[metric.metric] | round(4) }}</td>
             {% endif %}
-            <td><em>{{ participant.dataset_scores[dataset].prev_score | round(4) }}</em></td>
+            <td><em>{{ participant.dataset_scores[dataset].prev_score[metric.metric] | round(4) }}</em></td>
+            {% endfor %}
             {% endfor %}
             <td>{{ participant.last_run }}</td>
             <td>{{ participant.num_submissions }}</td>
