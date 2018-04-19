@@ -15,5 +15,6 @@ docker-machine create \
 
 eval $(docker-machine env clads-classify-leaderboard)
 docker-compose up -d
+sleep 10
 docker-compose exec mongo \
     mongo competition --eval "db.results.createIndex({'username': 1})"
