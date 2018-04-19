@@ -3,7 +3,7 @@ stop-words = "/data/stopwords.txt"
 
 dataset = "twitter-geo-withheld"
 corpus = "line.toml"
-index = "twitter-geo-idx"
+index = "twitter-geo-withheld-idx"
 uninvert = true
 timeout = 480
 
@@ -12,9 +12,9 @@ timeout = 480
 #
 # the ids should be specified as a range [x, y]:
 # documents with ids >= x and ids < y (strictly less than!) will be
-# included. You can use -1 to denote the end of the list.
+# included.
 training-set = [0, 5473]
-testing-set = [5473, -1]
+testing-set = [5473, 7298]
 
 [[analyzers]]
 method = "ngram-word"

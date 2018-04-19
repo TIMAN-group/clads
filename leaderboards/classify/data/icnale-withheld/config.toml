@@ -12,9 +12,9 @@ timeout = 240
 #
 # the ids should be specified as a range [x, y]:
 # documents with ids >= x and ids < y (strictly less than!) will be
-# included. You can use -1 to denote the end of the list.
+# included.
 training-set = [0, 4480]
-testing-set = [4480, -1]
+testing-set = [4480, 5600]
 
 [[analyzers]]
 method = "ngram-word"
