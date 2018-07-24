@@ -249,7 +249,7 @@ and will be listening on port `9005`.
 We can now create the Docker registry mirror cache server:
 
 ```bash
-./create-registry-cache.sh Standard_A1_v2
+./create-docker-registry.sh Standard_A1_v2
 ```
 
 This will do the following:
